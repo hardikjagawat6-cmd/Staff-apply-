@@ -226,10 +226,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php endif; ?>
 
     <form action="" method="POST">
-        <div class="form-group">
-            <label for="full_name">In-Game Name / Name</label>
-            <input type="text" id="full_name" name="full_name" required placeholder="Your gaming tag...">
+                <div class="form-group">
+            <label for="discord_tag">Discord User ID (Hold profile to copy ID)</label>
+            <input type="text" id="discord_tag" name="discord_tag" required placeholder="e.g. 48392019482019284">
         </div>
+
 
         <div class="form-group">
             <label for="discord_tag">Discord Username</label>
