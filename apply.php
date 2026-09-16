@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ==================================
 
 👤 **In-Game Name:** `$full_name`
-📱 **Discord Username:** `$discord_tag`
+📱 **Discord Profile Link:** <@$discord_tag>
 🎂 **Applicant Age:** `$age`
 🛡️ **Applied For Rank:** **$position**
 🌐 **Timezone / Region:** `$timezone`
