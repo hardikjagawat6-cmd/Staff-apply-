@@ -1,6 +1,6 @@
 <?php
 // 1. PASTE YOUR DISCORD WEBHOOK URL HERE
-$discord_webhook_url = "YOUR_DISCORD_WEBHOOK_URL_HERE";
+$discord_webhook_url = "https://discord.com/api/webhooks/1549740109492912228/fOsV6OKrAjF90C1Y_ynODPM9S59dN50tuS9uD7DDD1Bmh2gLcpW2yLz7iWp94jK9hWs5";
 
 $message = "";
 $messageClass = "";
