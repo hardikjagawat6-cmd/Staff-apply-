@@ -14,26 +14,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $timezone = strip_tags(trim($_POST['timezone'] ?? ''));
     $cover_letter = strip_tags(trim($_POST['cover_letter'] ?? ''));
 
-            // 2. Format a clean block perfectly optimized for staff emoji reactions
+                // 2. Single clear block of text for clean mobile copy-pasting
     $webhook_data = [
         "username" => "Staff Recruiter",
-        "content" => "==================================\n" .
-                     "🎮 **NEW STAFF APPLICATION RECEIVED**\n" .
-                     "==================================\n\n" .
-                     "👤 **In-Game Name:** `$full_name` \n" .
-                     "📱 **Discord Username:** `$discord_tag` \n" .
-                     "🎂 **Applicant Age:** `$age` \n" .
-                     "🛡️ **Applied For Rank:** **$position** \n" .
-                     "🌐 **Timezone / Region:** `$timezone` \n\n" .
-                     "📄 **Why should we choose them?** \n" .
-                     "> $cover_letter \n\n" .
-                     "==================================\n" .
-                     "⚙️ **MANAGEMENT STATUS INSTRUCTIONS:**\n" .
-                     "• React with ✅ to **ACCEPT** and start onboarding\n" .
-                     "• React with 🟡 to put on **HOLD / INTERVIEW**\n" .
-                     "• React with ❌ to **DENY / REJECT**\n" .
-                     "=================================="
+        "content" => "==================================
+🎮 **NEW STAFF APPLICATION RECEIVED**
+==================================
+
+👤 **In-Game Name:** `$full_name`
+📱 **Discord Username:** `$discord_tag`
+🎂 **Applicant Age:** `$age`
+🛡️ **Applied For Rank:** **$position**
+🌐 **Timezone / Region:** `$timezone`
+
+📄 **Why should we choose them?**
+> $cover_letter
+
+==================================
+⚙️ **MANAGEMENT STATUS INSTRUCTIONS:**
+• React with ✅ to **ACCEPT** and start onboarding
+• React with 🟡 to put on **HOLD / INTERVIEW**
+• React with ❌ to **DENY / REJECT**
+=================================="
     ];
+
 
 
 
