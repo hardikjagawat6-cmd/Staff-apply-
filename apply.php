@@ -14,26 +14,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $timezone = strip_tags(trim($_POST['timezone'] ?? ''));
     $cover_letter = strip_tags(trim($_POST['cover_letter'] ?? ''));
 
-    // 2. Format a Minecraft/Discord Gaming Styled Embed
+        // 2. Format a simple text message for testing channel output
     $webhook_data = [
         "username" => "Staff Recruiter",
-        "avatar_url" => "https://imgur.com", // Minecraft grass block icon
-        "embeds" => [[
-            "title" => "🎮 New Staff Application Received!",
-            "color" => 5621430, // Minecraft Emerald / Diamond Cyan Green-Blue border color
-            "fields" => [
-                ["name" => "👤 In-Game Name / Name", "value" => $full_name, "inline" => true],
-                ["name" => "📱 Discord Tag / ID", "value" => $discord_tag, "inline" => true],
-                ["name" => "🎂 Age", "value" => $age . " Years Old", "inline" => true],
-                ["name" => "🛡️ Desired Rank / Role", "value" => $position, "inline" => true],
-                ["name" => "🌐 Timezone", "value" => $timezone, "inline" => true],
-                ["name" => "📄 Why should we choose you?", "value" => !empty($cover_letter) ? $cover_letter : "No details provided.", "inline" => false]
-            ],
-            "footer" => [
-                "text" => "Gaming Staff Application • " . date("Y-m-d H:i:s")
-            ]
-        ]]
+        "content" => "🎮 **New Staff Application!** \n• **Name:** $full_name \n• **Discord:** $discord_tag \n• **Age:** $age \n• **Rank:** $position \n• **Timezone:** $timezone \n• **Reason:** $cover_letter"
     ];
+
 
     // 3. Send the data to Discord via PHP cURL
     $ch = curl_init($discord_webhook_url);
