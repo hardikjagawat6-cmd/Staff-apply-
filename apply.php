@@ -1,8 +1,7 @@
 <?php
 // 1. CONFIGURATION SETUP
-$discord_webhook_url = "https://discord.com/api/webhooks/1549740109492912228/fOsV6OKrAjF90C1Y_ynODPM9S59dN50tuS9uD7DDD1Bmh2gLcpW2yLz7iWp94jK9hWs5";
-$bot_token = getenv('DISCORD_BOT_TOKEN') ?: "MTU0OTc1NjQ2OTAwMjM3NTE2OA.GT7n6G.vVedyarP3vA_zl7w8x2RD_z3bSxaIJFkp878hk";
-
+$discord_webhook_url = getenv('DISCORD_WEBHOOK_URL') ?: "YOUR_WEBHOOK_HERE";
+$bot_token           = getenv('DISCORD_BOT_TOKEN') ?: "YOUR_BOT_TOKEN_HERE";
 $message = "";
 $messageClass = "";
 
