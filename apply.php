@@ -1,69 +1,101 @@
 <?php
-// 1. PASTE YOUR DISCORD WEBHOOK URL HERE
-$discord_webhook_url = "https://discord.com/api/webhooks/1549740109492912228/fOsV6OKrAjF90C1Y_ynODPM9S59dN50tuS9uD7DDD1Bmh2gLcpW2yLz7iWp94jK9hWs5";
+// 1. CONFIGURATION SETUP
+$discord_webhook_url = "YOUR_DISCORD_WEBHOOK_URL_HERE";
+$bot_token           = "YOUR_BOT_TOKEN_HERE"; // Paste your new bot token here
 
 $message = "";
 $messageClass = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Collect and sanitize form entries safely with empty string fallbacks
-    $full_name = strip_tags(trim($_POST['full_name'] ?? ''));
-    $discord_tag = strip_tags(trim($_POST['discord_tag'] ?? ''));
-    $age = isset($_POST['age']) ? (int)$_POST['age'] : 0;
-    $position = strip_tags(trim($_POST['position'] ?? ''));
-    $timezone = strip_tags(trim($_POST['timezone'] ?? ''));
+    $full_name    = strip_tags(trim($_POST['full_name'] ?? ''));
+    $discord_tag   = strip_tags(trim($_POST['discord_tag'] ?? '')); // This is the numerical User ID now
+    $age          = isset($_POST['age']) ? (int)$_POST['age'] : 0;
+    $position     = strip_tags(trim($_POST['position'] ?? ''));
+    $timezone     = strip_tags(trim($_POST['timezone'] ?? ''));
     $cover_letter = strip_tags(trim($_POST['cover_letter'] ?? ''));
 
-                // 2. Single clear block of text for clean mobile copy-pasting
+    // 2. SEND ALERT TO YOUR PRIVATE STAFF REVIEW CHANNEL
     $webhook_data = [
         "username" => "Staff Recruiter",
-        "content" => "==================================
-🎮 **NEW STAFF APPLICATION RECEIVED**
-==================================
-
-👤 **In-Game Name:** `$full_name`
-📱 **Discord Profile Link:** <@$discord_tag>
-🎂 **Applicant Age:** `$age`
-🛡️ **Applied For Rank:** **$position**
-🌐 **Timezone / Region:** `$timezone`
-
-📄 **Why should we choose them?**
-> $cover_letter
-
-==================================
-⚙️ **MANAGEMENT STATUS INSTRUCTIONS:**
-• React with ✅ to **ACCEPT** and start onboarding
-• React with 🟡 to put on **HOLD / INTERVIEW**
-• React with ❌ to **DENY / REJECT**
-=================================="
+        "content" => "==================================\n" .
+                     "🎮 **NEW STAFF APPLICATION RECEIVED**\n" .
+                     "==================================\n\n" .
+                     "👤 **In-Game Name:** `$full_name` \n" .
+                     "📱 **Discord User:** <@$discord_tag> (ID: `$discord_tag`) \n" .
+                     "🎂 **Applicant Age:** `$age` \n" .
+                     "🛡️ **Applied For Rank:** **$position** \n" .
+                     "🌐 **Timezone / Region:** `$timezone` \n\n" .
+                     "📄 **Why should we choose them?** \n" .
+                     "> $cover_letter \n\n" .
+                     "==================================\n" .
+                     "⚙️ **MANAGEMENT STATUS INSTRUCTIONS:**\n" .
+                     "• React with ✅ to ACCEPT and start onboarding\n" .
+                     "• React with ❌ to DENY / REJECT\n" .
+                     "=================================="
     ];
 
-
-
-
-    // 3. Send the data to Discord via PHP cURL
+    // Send the alert card via standard Webhook connection
     $ch = curl_init($discord_webhook_url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($webhook_data));
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($ch, CURLOPT_HEADER, 0);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_exec($ch);
     curl_close($ch);
 
-    // 4. Verify transmission status
-    if ($http_code == 204 || $http_code == 200) {
-        $message = "🎉 Application sent! Keep an eye on your Discord DMs.";
-        $messageClass = "success-msg";
+    // 3. AUTOMATICALLY SEND THE DM NOTIFICATION TO THE USER VIA THE BOT
+    // Step A: Open a Direct Message DM Channel gateway with the user's ID
+    $dm_url = "https://discord.com";
+    $dm_payload = json_encode(["recipient_id" => $discord_tag]);
+
+    $ch_dm = curl_init($dm_url);
+    curl_setopt($ch_dm, CURLOPT_HTTPHEADER, [
+        "Authorization: Bot $bot_token",
+        "Content-Type: application/json"
+    ]);
+    curl_setopt($ch_dm, CURLOPT_POST, 1);
+    curl_setopt($ch_dm, CURLOPT_POSTFIELDS, $dm_payload);
+    curl_setopt($ch_dm, CURLOPT_RETURNTRANSFER, 1);
+    $dm_response = json_decode(curl_exec($ch_dm), true);
+    curl_close($ch_dm);
+
+    // Step B: Send the actual DM text message if the channel gateway opened successfully
+    if (isset($dm_response['id'])) {
+        $channel_id = $dm_response['id'];
+        $msg_url = "https://discord.com";
+        
+        // Define your custom DM message content text here
+        $dm_message_text = "👋 **Hey there, $full_name!**\n\nYour application for **$position** has been successfully submitted to our recruitment team! \n\nWe have received your details and our management will review them shortly. Please make sure your DMs stay open so we can update you on your status. Thanks for applying! 🎮";
+        
+        $msg_payload = json_encode(["content" => $dm_message_text]);
+
+        $ch_msg = curl_init($msg_url);
+        curl_setopt($ch_msg, CURLOPT_HTTPHEADER, [
+            "Authorization: Bot $bot_token",
+            "Content-Type: application/json"
+        ]);
+        curl_setopt($ch_msg, CURLOPT_POST, 1);
+        curl_setopt($ch_msg, CURLOPT_POSTFIELDS, $msg_payload);
+        curl_setopt($ch_msg, CURLOPT_RETURNTRANSFER, 1);
+        curl_exec($ch_msg);
+        $http_code = curl_getinfo($ch_msg, CURLINFO_HTTP_CODE);
+        curl_close($ch_msg);
+
+        if ($http_code == 200 || $http_code == 204) {
+            $message = "🎉 Application sent! A confirmation DM has been delivered to your Discord.";
+            $messageClass = "success-msg";
+        } else {
+            $message = "🎉 Application saved, but the bot couldn't slide into your DMs (Are your privacy settings blocking bot messages?).";
+            $messageClass = "success-msg";
+        }
     } else {
-        $message = "❌ Error: Could not process submission. Check webhook config.";
-        $messageClass = "error-msg";
+        $message = "🎉 Application recorded, but your DM channel could not be verified. Double-check your numerical User ID entry.";
+        $messageClass = "success-msg";
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
