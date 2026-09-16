@@ -1,44 +1,60 @@
 <?php
-// Initialize message variables
+// 1. PASTE YOUR DISCORD WEBHOOK URL HERE
+$discord_webhook_url = "https://discord.com/api/webhooks/1549740109492912228/fOsV6OKrAjF90C1Y_ynODPM9S59dN50tuS9uD7DDD1Bmh2gLcpW2yLz7iWp94jK9hWs5";
+
 $message = "";
-$message_type = "";
+$messageClass = "";
 
-// Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. Collect and sanitize text inputs safely
-    $full_name  = htmlspecialchars(trim($_POST['full_name']));
-    $email      = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-    $phone      = htmlspecialchars(trim($_POST['phone']));
-    $position   = htmlspecialchars(trim($_POST['position']));
-    $experience = htmlspecialchars(trim($_POST['experience']));
+    // Collect and sanitize form entries
+    $full_name = strip_tags(trim($_POST['full_name']));
+    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
+    $phone = strip_tags(trim($_POST['phone']));
+    $position = strip_tags(trim($_POST['position']));
+    $experience = (int)$_POST['experience'];
+    $cover_letter = strip_tags(trim($_POST['cover_letter']));
 
-    // 2. Simple validation check
-    if (empty($full_name) || empty($email) || empty($position)) {
-        $message = "Please fill in all required fields.";
-        $message_type = "error";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = "Invalid email format.";
-        $message_type = "error";
+    // 2. Format a beautiful Discord Rich Embed card
+    $webhook_data = [
+        "username" => "Recruitment Bot",
+        "avatar_url" => "https://imgur.com", // Avatar icon
+        "embeds" => [[
+            "title" => "📝 New Staff Application Received!",
+            "color" => 11025911, // Elegant Purple border color
+            "fields" => [
+                ["name" => "👤 Full Name", "value" => $full_name, "inline" => true],
+                ["name" => "💼 Target Position", "value" => $position, "inline" => true],
+                ["name" => "📧 Email Address", "value" => $email, "inline" => false],
+                ["name" => "📞 Phone Number", "value" => $phone, "inline" => true],
+                ["name" => "⏳ Experience", "value" => $experience . " Years", "inline" => true],
+                ["name" => "📄 Cover Letter / Notes", "value" => !empty($cover_letter) ? $cover_letter : "No notes provided.", "inline" => false]
+            ],
+            "footer" => [
+                "text" => "Sent via Staff Portal • " . date("Y-m-d H:i:s")
+            ]
+        ]]
+    ];
+
+    // 3. Send the data to Discord via PHP cURL
+    $ch = curl_init($discord_webhook_url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($webhook_data));
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // 4. Verify transmission status
+    if ($http_code == 204 || $http_code == 200) {
+        $message = "🎉 Application submitted successfully! Our HR team will review it.";
+        $messageClass = "success-msg";
     } else {
-        
-        /* 
-        ========================================================================
-        DATABASE INTEGRATION (OPTIONAL)
-        To save data permanently, uncomment this block and configure your MySQL database.
-        ========================================================================
-        $conn = new mysqli("localhost", "DB_USERNAME", "DB_PASSWORD", "DB_NAME");
-        if ($conn->connect_error) { die("Connection failed: " . $conn->connect_error); }
-        
-        $stmt = $conn->prepare("INSERT INTO applicants (name, email, phone, position, experience) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $full_name, $email, $phone, $position, $experience);
-        $stmt->execute();
-        $stmt->close();
-        $conn->close();
-        */
-
-        // For this demo, we mock a successful submission
-        $message = "Success! Thank you, $full_name. Your application for the $position role has been submitted.";
-        $message_type = "success";
+        $message = "❌ Error: Could not process submission. Please check system configs.";
+        $messageClass = "error-msg";
     }
 }
 ?>
@@ -47,26 +63,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Application Form</title>
+    <title>Join Our Team | Staff Application Portal</title>
     <style>
-        /* Modern reset and font alignment */
-        * {
+        /* Modern Abstract Mesh Gradient Background */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #121826 0%, #1e1b4b 40%, #311042 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* Beautiful interactive animated gradient background */
-        body {
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            padding: 20px;
+            min-height: 100vh;
+            color: #f3f4f6;
         }
 
         @keyframes gradientBG {
@@ -75,165 +86,171 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             100% { background-position: 0% 50%; }
         }
 
-        /* Glassmorphism Container UI */
+        /* Glassmorphism Form Container */
         .form-container {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
             padding: 40px;
             width: 100%;
             max-width: 550px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-            color: #ffffff;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+            margin: 20px;
         }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 28px;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        p.subtitle {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 14px;
-            color: #f0f0f0;
-        }
-
-        /* Input fields styling */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
+        h2 { 
+            text-align: center; 
+            margin-top: 0; 
+            font-size: 28px; 
             font-weight: 600;
+            color: #ffffff; 
             letter-spacing: 0.5px;
         }
-
-        input[type="text"],
-        input[type="email"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            font-size: 15px;
-            color: #fff;
-            outline: none;
-            transition: all 0.3s ease;
+        
+        p.subtitle { 
+            text-align: center; 
+            color: #9ca3af; 
+            margin-bottom: 30px; 
+            font-size: 14px; 
+        }
+        
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+            font-weight: 500;
+            color: #e5e7eb; 
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%; 
+            padding: 12px 16px; 
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 10px;
+            color: #ffffff; 
+            font-size: 15px; 
+            outline: none; 
+            transition: all 0.3s ease; 
+            box-sizing: border-box;
         }
 
-        /* Style options inside select element for legibility */
-        select option {
-            background: #23a6d5;
-            color: #fff;
+        .form-group input:focus, .form-group textarea:focus {
+            background: rgba(255, 255, 255, 0.12); 
+            border-color: #a855f7; 
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
         }
 
-        input:focus, select:focus, textarea:focus {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
-        textarea {
-            resize: vertical;
-            height: 100px;
-        }
-
-        /* Button hover animations */
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            background: #ffffff;
-            border: none;
-            border-radius: 8px;
-            color: #333;
-            font-size: 16px;
-            font-weight: bold;
+        /* styling for datalist options dropdown dropdown natively supported by OS */
+        input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            opacity: 0.5;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .submit-btn:hover {
-            background: #23a6d5;
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        textarea { 
+            resize: vertical; 
+            height: 110px; 
         }
 
-        /* Success & Error Notifications */
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-align: center;
+        .submit-btn {
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            border: none; 
+            border-radius: 10px; 
+            color: #ffffff; 
+            font-size: 16px; 
+            font-weight: 600;
+            cursor: pointer; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+            margin-top: 10px;
         }
-        .alert.success {
-            background: rgba(46, 204, 113, 0.3);
-            border: 1px solid #2ecc71;
-            color: #fff;
+
+        .submit-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4); 
         }
-        .alert.error {
-            background: rgba(231, 76, 60, 0.3);
-            border: 1px solid #e74c3c;
-            color: #fff;
+        
+        .alert { 
+            padding: 12px 16px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            font-size: 14px; 
+            text-align: center; 
+        }
+        
+        .success-msg { 
+            background: rgba(16, 185, 129, 0.2); 
+            border: 1px solid #10b981; 
+            color: #34d399; 
+        }
+        
+        .error-msg { 
+            background: rgba(239, 68, 68, 0.2); 
+            border: 1px solid #ef4444; 
+            color: #f87171; 
         }
     </style>
 </head>
 <body>
 
 <div class="form-container">
-    <h2>Join Our Team</h2>
-    <p class="subtitle">Submit your details to apply for an open position</p>
+    <h2>Apply for Staff Position</h2>
+    <p class="subtitle">Join our dynamic team and help shape the future.</p>
 
-    <!-- PHP Alert Messages -->
     <?php if (!empty($message)): ?>
-        <div class="alert <?php echo $message_type; ?>">
+        <div class="alert <?php echo $messageClass; ?>">
             <?php echo $message; ?>
         </div>
     <?php endif; ?>
 
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+    <form action="" method="POST">
         <div class="form-group">
-            <label for="full_name">Full Name *</label>
+            <label for="full_name">Full Name</label>
             <input type="text" id="full_name" name="full_name" required placeholder="John Doe">
         </div>
 
         <div class="form-group">
-            <label for="email">Email Address *</label>
+            <label for="email">Email Address</label>
             <input type="email" id="email" name="email" required placeholder="johndoe@example.com">
         </div>
 
         <div class="form-group">
             <label for="phone">Phone Number</label>
-            <input type="text" id="phone" name="phone" placeholder="+1 (555) 000-0000">
+            <input type="tel" id="phone" name="phone" required placeholder="+1 (555) 000-0000">
         </div>
 
         <div class="form-group">
-            <label for="position">Position Applying For *</label>
-            <select id="position" name="position" required>
-                <option value="" disabled selected>Select a role...</option>
-                <option value="Manager">Manager</option>
-                <option value="Developer">Developer</option>
-                <option value="Designer">Designer</option>
-                <option value="Support Staff">Support Staff</option>
-            </select>
+            <label for="position">Target Position</label>
+            <!-- Datalist integration allows typing custom string values OR selection -->
+            <input type="text" id="position" name="position" list="positions-list" required placeholder="Select a role or type your own...">
+            <datalist id="positions-list">
+                <option value="Frontend Developer">
+                <option value="Backend Developer">
+                <option value="UI/UX Designer">
+                <option value="Project Manager">
+                <option value="HR Specialist">
+                <option value="Data Analyst">
+                <option value="Customer Support Specialist">
+            </datalist>
         </div>
 
         <div class="form-group">
-            <label for="experience">Brief Work Experience</label>
-            <textarea id="experience" name="experience" placeholder="Tell us briefly about your relevant background..."></textarea>
+            <label for="experience">Years of Experience</label>
+            <input type="number" id="experience" name="experience" min="0" max="50" required placeholder="e.g. 3">
+        </div>
+
+        <div class="form-group">
+            <label for="cover_letter">Brief Cover Letter / Notes</label>
+            <textarea id="cover_letter" name="cover_letter" placeholder="Tell us why you are a great fit..."></textarea>
         </div>
 
         <button type="submit" class="submit-btn">Submit Application</button>
