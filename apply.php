@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             letter-spacing: 0.5px;
         }
         
-        .form-group input, .form-group textarea {
+                .form-group input, .form-group textarea {
             width: 100%; 
             padding: 12px 14px; 
             background: #15181f;
@@ -134,7 +134,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             outline: none; 
             transition: all 0.2s ease; 
             box-sizing: border-box;
+            
+            /* FORCES MOBILE PHONES TO SHOW TEXT OPTIONS CORRECTLY */
+            color-scheme: dark;
         }
+
 
         .form-group input:focus, .form-group textarea:focus {
             border-color: #55cdfc; 
