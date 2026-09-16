@@ -226,9 +226,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php endif; ?>
 
     <form action="" method="POST">
-                <div class="form-group">
-            <label for="discord_tag">Discord User ID (Hold profile to copy ID)</label>
-            <input type="text" id="discord_tag" name="discord_tag" required placeholder="e.g. 48392019482019284">
+                        <div class="form-group">
+            <label for="discord_tag">Discord User ID</label>
+            <input type="text" id="discord_tag" name="discord_tag" required placeholder="e.g. 39481029482019482">
+            <small style="color: #94a3b8; font-size: 11px; display: block; margin-top: 4px;">
+                *Enable Developer Mode in Discord settings, tap your profile, and click "Copy User ID".
+            </small>
         </div>
 
 
