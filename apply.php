@@ -11,10 +11,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $discord_tag   = strip_tags(trim($_POST['discord_tag'] ?? '')); // This is the numerical User ID now
     $age          = isset($_POST['age']) ? (int)$_POST['age'] : 0;
     $position     = strip_tags(trim($_POST['position'] ?? ''));
-    $timezone     = strip_tags(trim($_POST['timezone'] ?? ''));
+        $timezone = strip_tags(trim($_POST['timezone'] ?? ''));
     $cover_letter = strip_tags(trim($_POST['cover_letter'] ?? ''));
 
-    // 2. SEND ALERT TO YOUR PRIVATE STAFF REVIEW CHANNEL
+    // --- SAVE TO LOCAL SQLITE DATABASE FOR ADMIN.PHP ---
+    try {
+        $local_db = new PDO('sqlite:recruitment.db');
+        $local_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        $local_db->exec("CREATE TABLE IF NOT EXISTS staff_applications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            full_name TEXT NOT NULL,
+            discord_tag TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            position TEXT NOT NULL,
+            timezone TEXT NOT NULL,
+            cover_letter TEXT,
+            status TEXT DEFAULT 'Pending',
+            applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )");
+
+        $stmt_insert = $local_db->prepare("INSERT INTO staff_applications (full_name, discord_tag, age, position, timezone, cover_letter) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt_insert->execute([$full_name, $discord_tag, $age, $position, $timezone, $cover_letter]);
+    } catch (PDOException $e) {
+        // Suppress errors to ensure the Discord message still goes through
+    }
+    // ----------------------------------------------------
+
+    // 2. Format a clean block perfectly optimized for staff emoji reactions
     $webhook_data = [
         "username" => "Staff Recruiter",
         "content" => "==================================\n" .
