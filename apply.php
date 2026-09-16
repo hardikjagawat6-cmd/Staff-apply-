@@ -14,11 +14,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $timezone = strip_tags(trim($_POST['timezone'] ?? ''));
     $cover_letter = strip_tags(trim($_POST['cover_letter'] ?? ''));
 
-        // 2. Format a simple text message for testing channel output
+            // 2. Format a clean block perfectly optimized for staff emoji reactions
     $webhook_data = [
         "username" => "Staff Recruiter",
-        "content" => "🎮 **New Staff Application!** \n• **Name:** $full_name \n• **Discord:** $discord_tag \n• **Age:** $age \n• **Rank:** $position \n• **Timezone:** $timezone \n• **Reason:** $cover_letter"
+        "content" => "==================================\n" .
+                     "🎮 **NEW STAFF APPLICATION RECEIVED**\n" .
+                     "==================================\n\n" .
+                     "👤 **In-Game Name:** `$full_name` \n" .
+                     "📱 **Discord Username:** `$discord_tag` \n" .
+                     "🎂 **Applicant Age:** `$age` \n" .
+                     "🛡️ **Applied For Rank:** **$position** \n" .
+                     "🌐 **Timezone / Region:** `$timezone` \n\n" .
+                     "📄 **Why should we choose them?** \n" .
+                     "> $cover_letter \n\n" .
+                     "==================================\n" .
+                     "⚙️ **MANAGEMENT STATUS INSTRUCTIONS:**\n" .
+                     "• React with ✅ to **ACCEPT** and start onboarding\n" .
+                     "• React with 🟡 to put on **HOLD / INTERVIEW**\n" .
+                     "• React with ❌ to **DENY / REJECT**\n" .
+                     "=================================="
     ];
+
 
 
     // 3. Send the data to Discord via PHP cURL
