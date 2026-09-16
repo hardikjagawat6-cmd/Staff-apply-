@@ -1,36 +1,36 @@
 <?php
 // 1. PASTE YOUR DISCORD WEBHOOK URL HERE
-$discord_webhook_url = "https://discord.com/api/webhooks/1549740109492912228/fOsV6OKrAjF90C1Y_ynODPM9S59dN50tuS9uD7DDD1Bmh2gLcpW2yLz7iWp94jK9hWs5";
+$discord_webhook_url = "YOUR_DISCORD_WEBHOOK_URL_HERE";
 
 $message = "";
 $messageClass = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Collect and sanitize form entries safely with empty string fallbacks
+    // Collect and sanitize form entries safely with empty string fallbacks
     $full_name = strip_tags(trim($_POST['full_name'] ?? ''));
-    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
-    $phone = strip_tags(trim($_POST['phone'] ?? ''));
+    $discord_tag = strip_tags(trim($_POST['discord_tag'] ?? ''));
+    $age = isset($_POST['age']) ? (int)$_POST['age'] : 0;
     $position = strip_tags(trim($_POST['position'] ?? ''));
-    $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
+    $timezone = strip_tags(trim($_POST['timezone'] ?? ''));
     $cover_letter = strip_tags(trim($_POST['cover_letter'] ?? ''));
 
-    // 2. Format a beautiful Discord Rich Embed card
+    // 2. Format a Minecraft/Discord Gaming Styled Embed
     $webhook_data = [
-        "username" => "Recruitment Bot",
-        "avatar_url" => "https://imgur.com", // Avatar icon
+        "username" => "Staff Recruiter",
+        "avatar_url" => "https://imgur.com", // Minecraft grass block icon
         "embeds" => [[
-            "title" => "📝 New Staff Application Received!",
-            "color" => 11025911, // Elegant Purple border color
+            "title" => "🎮 New Staff Application Received!",
+            "color" => 5621430, // Minecraft Emerald / Diamond Cyan Green-Blue border color
             "fields" => [
-                ["name" => "👤 Full Name", "value" => $full_name, "inline" => true],
-                ["name" => "💼 Target Position", "value" => $position, "inline" => true],
-                ["name" => "📧 Email Address", "value" => $email, "inline" => false],
-                ["name" => "📞 Phone Number", "value" => $phone, "inline" => true],
-                ["name" => "⏳ Experience", "value" => $experience . " Years", "inline" => true],
-                ["name" => "📄 Cover Letter / Notes", "value" => !empty($cover_letter) ? $cover_letter : "No notes provided.", "inline" => false]
+                ["name" => "👤 In-Game Name / Name", "value" => $full_name, "inline" => true],
+                ["name" => "📱 Discord Tag / ID", "value" => $discord_tag, "inline" => true],
+                ["name" => "🎂 Age", "value" => $age . " Years Old", "inline" => true],
+                ["name" => "🛡️ Desired Rank / Role", "value" => $position, "inline" => true],
+                ["name" => "🌐 Timezone", "value" => $timezone, "inline" => true],
+                ["name" => "📄 Why should we choose you?", "value" => !empty($cover_letter) ? $cover_letter : "No details provided.", "inline" => false]
             ],
             "footer" => [
-                "text" => "Sent via Staff Portal • " . date("Y-m-d H:i:s")
+                "text" => "Gaming Staff Application • " . date("Y-m-d H:i:s")
             ]
         ]]
     ];
@@ -50,10 +50,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 4. Verify transmission status
     if ($http_code == 204 || $http_code == 200) {
-        $message = "🎉 Application submitted successfully! Our HR team will review it.";
+        $message = "🎉 Application sent! Keep an eye on your Discord DMs.";
         $messageClass = "success-msg";
     } else {
-        $message = "❌ Error: Could not process submission. Please check system configs.";
+        $message = "❌ Error: Could not process submission. Check webhook config.";
         $messageClass = "error-msg";
     }
 }
@@ -63,40 +63,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Our Team | Staff Application Portal</title>
+    <title>Staff Application Portal</title>
     <style>
-        /* Modern Abstract Mesh Gradient Background */
+        /* Minecraft Deep Slate Dark Theme */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #121826 0%, #1e1b4b 40%, #311042 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: linear-gradient(135deg, #141419 0%, #1c1d24 50%, #111215 100%);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: #f3f4f6;
+            color: #e2e8f0;
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Glassmorphism Form Container */
+        /* Clean Box Design with Cyan Diamond Border Accent */
         .form-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px;
+            background: #1f232c;
+            border: 2px solid #555e70;
+            border-top: 4px solid #55cdfc; /* Diamond Cyan top border */
+            border-radius: 12px;
+            padding: 35px;
             width: 100%;
-            max-width: 550px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
             box-sizing: border-box;
             margin: 20px;
         }
@@ -104,51 +95,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         h2 { 
             text-align: center; 
             margin-top: 0; 
-            font-size: 28px; 
-            font-weight: 600;
+            font-size: 26px; 
+            font-weight: 700;
             color: #ffffff; 
-            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         p.subtitle { 
             text-align: center; 
-            color: #9ca3af; 
-            margin-bottom: 30px; 
+            color: #94a3b8; 
+            margin-bottom: 25px; 
             font-size: 14px; 
         }
         
         .form-group { 
-            margin-bottom: 20px; 
+            margin-bottom: 18px; 
         }
         
         .form-group label { 
             display: block; 
-            margin-bottom: 8px; 
-            font-size: 14px; 
-            font-weight: 500;
-            color: #e5e7eb; 
+            margin-bottom: 6px; 
+            font-size: 13px; 
+            font-weight: 600;
+            color: #cbd5e1; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .form-group input, .form-group textarea {
             width: 100%; 
-            padding: 12px 16px; 
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            border-radius: 10px;
+            padding: 12px 14px; 
+            background: #15181f;
+            border: 1px solid #3f4756; 
+            border-radius: 8px;
             color: #ffffff; 
             font-size: 15px; 
             outline: none; 
-            transition: all 0.3s ease; 
+            transition: all 0.2s ease; 
             box-sizing: border-box;
         }
 
         .form-group input:focus, .form-group textarea:focus {
-            background: rgba(255, 255, 255, 0.12); 
-            border-color: #a855f7; 
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+            border-color: #55cdfc; 
+            box-shadow: 0 0 8px rgba(85, 205, 252, 0.3);
         }
 
-        /* styling for datalist options dropdown dropdown natively supported by OS */
         input::-webkit-calendar-picker-indicator {
             filter: invert(1);
             opacity: 0.5;
@@ -157,44 +149,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         textarea { 
             resize: vertical; 
-            height: 110px; 
+            height: 120px; 
         }
 
+        /* Minecraft Green Action Button */
         .submit-btn {
             width: 100%; 
             padding: 14px; 
-            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            background: #22c55e;
             border: none; 
-            border-radius: 10px; 
+            border-radius: 8px; 
             color: #ffffff; 
             font-size: 16px; 
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer; 
-            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+            transition: all 0.2s ease;
             margin-top: 10px;
+            box-shadow: 0 4px 0 #15803d;
         }
 
         .submit-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4); 
+            background: #16a34a;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 #166534;
+        }
+        
+        .submit-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #166534;
         }
         
         .alert { 
             padding: 12px 16px; 
-            border-radius: 10px; 
+            border-radius: 8px; 
             margin-bottom: 20px; 
             font-size: 14px; 
             text-align: center; 
+            font-weight: 600;
         }
         
         .success-msg { 
-            background: rgba(16, 185, 129, 0.2); 
-            border: 1px solid #10b981; 
-            color: #34d399; 
+            background: rgba(34, 197, 94, 0.15); 
+            border: 1px solid #22c55e; 
+            color: #4ade80; 
         }
         
         .error-msg { 
-            background: rgba(239, 68, 68, 0.2); 
+            background: rgba(239, 68, 68, 0.15); 
             border: 1px solid #ef4444; 
             color: #f87171; 
         }
@@ -203,8 +206,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
 <div class="form-container">
-    <h2>Apply for Staff Position</h2>
-    <p class="subtitle">Join our dynamic team and help shape the future.</p>
+    <h2>Apply for Staff</h2>
+    <p class="subtitle">Fill out the details to join our staff team.</p>
 
     <?php if (!empty($message)): ?>
         <div class="alert <?php echo $messageClass; ?>">
@@ -214,43 +217,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <form action="" method="POST">
         <div class="form-group">
-            <label for="full_name">Full Name</label>
-            <input type="text" id="full_name" name="full_name" required placeholder="John Doe">
+            <label for="full_name">In-Game Name / Name</label>
+            <input type="text" id="full_name" name="full_name" required placeholder="Your gaming tag...">
         </div>
 
         <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" required placeholder="johndoe@example.com">
+            <label for="discord_tag">Discord Username</label>
+            <input type="text" id="discord_tag" name="discord_tag" required placeholder="username (or name#0000)">
         </div>
 
         <div class="form-group">
-            <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" name="phone" required placeholder="+1 (555) 000-0000">
+            <label for="age">Your Age</label>
+            <input type="number" id="age" name="age" min="10" max="100" required placeholder="e.g. 16">
         </div>
 
         <div class="form-group">
-            <label for="position">Target Position</label>
-            <!-- Datalist integration allows typing custom string values OR selection -->
-            <input type="text" id="position" name="position" list="positions-list" required placeholder="Select a role or type your own...">
+            <label for="position">What do you want to apply for?</label>
+            <!-- Datalist lets them pick suggested gaming ranks OR type something else -->
+            <input type="text" id="position" name="position" list="positions-list" required placeholder="Select a rank or type your own...">
             <datalist id="positions-list">
-                <option value="Frontend Developer">
-                <option value="Backend Developer">
-                <option value="UI/UX Designer">
-                <option value="Project Manager">
-                <option value="HR Specialist">
-                <option value="Data Analyst">
-                <option value="Customer Support Specialist">
+                <option value="Helper">
+                <option value="Moderator (Mod)">
+                <option value="Admin">
+                <option value="Builder">
+                <option value="Developer (Dev)">
+                <option value="Discord Staff">
             </datalist>
         </div>
 
         <div class="form-group">
-            <label for="experience">Years of Experience</label>
-            <input type="number" id="experience" name="experience" min="0" max="50" required placeholder="e.g. 3">
+            <label for="timezone">Your Timezone / Country</label>
+            <input type="text" id="timezone" name="timezone" required placeholder="e.g. GMT+5:30, EST, or India">
         </div>
 
         <div class="form-group">
-            <label for="cover_letter">Brief Cover Letter / Notes</label>
-            <textarea id="cover_letter" name="cover_letter" placeholder="Tell us why you are a great fit..."></textarea>
+            <label for="cover_letter">Why should we choose you over others?</label>
+            <textarea id="cover_letter" name="cover_letter" required placeholder="Tell us about your previous experience, skills, and why you want to help our community..."></textarea>
         </div>
 
         <button type="submit" class="submit-btn">Submit Application</button>
