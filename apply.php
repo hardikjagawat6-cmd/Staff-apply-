@@ -235,19 +235,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="number" id="age" name="age" min="10" max="100" required placeholder="e.g. 16">
         </div>
 
-        <div class="form-group">
+                <div class="form-group">
             <label for="position">What do you want to apply for?</label>
-            <!-- Datalist lets them pick suggested gaming ranks OR type something else -->
-            <input type="text" id="position" name="position" list="positions-list" required placeholder="Select a rank or type your own...">
-            <datalist id="positions-list">
-                <option value="Helper">
-                <option value="Moderator (Mod)">
-                <option value="Admin">
-                <option value="Builder">
-                <option value="Developer (Dev)">
-                <option value="Discord Staff">
-            </datalist>
+            <select id="position" name="position" required style="color-scheme: dark;">
+                <option value="" disabled selected>Select your rank / role...</option>
+                <option value="Helper">Helper</option>
+                <option value="Moderator (Mod)">Moderator (Mod)</option>
+                <option value="Admin">Admin</option>
+                <option value="Builder">Builder</option>
+                <option value="Developer (Dev)">Developer (Dev)</option>
+                <option value="Discord Staff">Discord Staff</option>
+            </select>
         </div>
+
 
         <div class="form-group">
             <label for="timezone">Your Timezone / Country</label>
