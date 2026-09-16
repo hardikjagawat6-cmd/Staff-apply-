@@ -6,13 +6,13 @@ $message = "";
 $messageClass = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Collect and sanitize form entries
-    $full_name = strip_tags(trim($_POST['full_name']));
-    $email = filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL);
-    $phone = strip_tags(trim($_POST['phone']));
-    $position = strip_tags(trim($_POST['position']));
-    $experience = (int)$_POST['experience'];
-    $cover_letter = strip_tags(trim($_POST['cover_letter']));
+        // Collect and sanitize form entries safely with empty string fallbacks
+    $full_name = strip_tags(trim($_POST['full_name'] ?? ''));
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+    $phone = strip_tags(trim($_POST['phone'] ?? ''));
+    $position = strip_tags(trim($_POST['position'] ?? ''));
+    $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
+    $cover_letter = strip_tags(trim($_POST['cover_letter'] ?? ''));
 
     // 2. Format a beautiful Discord Rich Embed card
     $webhook_data = [
